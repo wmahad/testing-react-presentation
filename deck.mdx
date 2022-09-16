@@ -3,98 +3,83 @@ import {
   CodeSurferColumns,
   Step,
 } from "code-surfer";
-import { github, vsDark } from "@code-surfer/themes";
+import {
+  github,
+  vsDark,
+  nightOwl,
+  dracula,
+  shadesOfPurple,
+} from "@code-surfer/themes";
 
-export const theme = vsDark;
+export const theme = shadesOfPurple;
 
-# Hello 👋
-
-You are using [MDX Deck](https://github.com/jxnblk/mdx-deck) and [Code Surfer](https://codesurfer.pomb.us)
+# Testing react Components
 
 ---
 
-<CodeSurfer>
+## Agenda
 
-```js title="This is a title" subtitle="and this a subtitle"
-function lorem(ipsum, dolor = 1) {
-  const sit = ipsum == null ? 0 : ipsum.sit;
-  dolor = sit - amet(dolor);
-  return sit
-    ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor)
-    : [];
-}
+- Context
+- Solutions in the community
+- Proposition
+  - Tools
+  - Benefit of using the tools
+- Proposition in practice
+- Feedback
 
-function incididunt(ipsum, ut = 1) {
-  ut = labore.et(amet(ut), 0);
-  const sit = ipsum == null ? 0 : ipsum.sit;
+---
 
-  if (!sit || ut < 1) {
-    return [];
-  }
+# Context/Background
 
-  let dolore = 0;
-  let magna = 0;
-  const aliqua = new eiusmod(labore.ut(sit / ut));
+---
 
-  while (dolore < sit) {
-    aliqua[magna++] = consectetur(
-      ipsum,
-      dolore,
-      (dolore += ut)
-    );
-  }
+<CodeSurfer theme={nightOwl}>
 
-  return aliqua;
-}
+```js file=./code/problem.tsx title="Sample component"
+
 ```
 
-```js
-function lorem(ipsum, dolor = 1) {
-  const sit = ipsum == null ? 0 : ipsum.sit;
-  dolor = sit - amet(dolor);
-  return sit
-    ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor)
-    : [];
-}
+```js 41:46 file=./code/problem.tsx title="Example of query"
 
-function adipiscing(...elit) {
-  if (!elit.sit) {
-    return [];
-  }
-
-  const sed = elit[0];
-  return eiusmod.tempor(sed) ? sed : [sed];
-}
-
-function incididunt(ipsum, ut = 1) {
-  ut = labore.et(amet(ut), 0);
-  const sit = ipsum == null ? 0 : ipsum.sit;
-
-  if (!sit || ut < 1) {
-    return [];
-  }
-
-  let dolore = 0;
-  let magna = 0;
-  const aliqua = new eiusmod(labore.ut(sit / ut));
-
-  while (dolore < sit) {
-    aliqua[magna++] = consectetur(
-      ipsum,
-      dolore,
-      (dolore += ut)
-    );
-  }
-
-  return aliqua;
-}
 ```
 
-```diff 1[10:14],2[15:19],3[22:27],10:12
+```js 48:62 file=./code/problem.tsx title="Example of a mutation" subtitle="How do you test onError and onCompleted?"
+
+```
+
+```js 64:78 file=./code/problem.tsx subtitle="Trigger for the mutation"
+
+```
+
+```js 110:116 file=./code/problem.tsx subtitle="handles the loading state of the query"
+
+```
+
+```js 118:169 file=./code/problem.tsx subtitle="The entire form"
+
+```
+
+```js 159[17:40] file=./code/problem.tsx subtitle="Loading state when the mutation executes"
 
 ```
 
 </CodeSurfer>
+
+---
+
+## Proposition (use a combination of these tools)
+
+- [Mock Service Worker(MSW)](https://mswjs.io/)
+
+  Mocks by intercepting requests on the network level/layer.
+
+- [Codegen TS MSW generator](https://www.the-guild.dev/graphql/codegen/plugins/typescript/typescript-msw)
+
+  This plugin generates mock handlers with Typescript
+
+- [graphql-codegen-factories](https://gabinaureche.com/graphql-codegen-factories/)
+
+  This plugin generates factories from a Graphql schema and operations
 
 ---
 
@@ -103,7 +88,7 @@ function incididunt(ipsum, ut = 1) {
 <Step>
 
 ```js
-const magna = aliqua => aliqua.ut((enim, ad) => enim, 0);
+const magna = (aliqua) => aliqua.ut((enim, ad) => enim, 0);
 ```
 
 ```js
@@ -125,7 +110,7 @@ const lorem = (ipsum, dolor, sit) => {
   );
 };
 
-const magna = aliqua => aliqua.ut((enim, ad) => enim, 0);
+const magna = (aliqua) => aliqua.ut((enim, ad) => enim, 0);
 ```
 
 ```js
@@ -148,5 +133,5 @@ const sed = (eiusmod, tempor, incididunt) => {
 
 ---
 
-docs:  
+docs:
 [codesurfer.pomb.us](https://codesurfer.pomb.us)
