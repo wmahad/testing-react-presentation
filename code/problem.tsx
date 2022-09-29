@@ -28,22 +28,22 @@ export const EditResidenceContainer = ({
   customerUuid,
 }: Props) => {
   const { showNotification } = useNotificationContext();
+  // Queries
   const { data: formOptionsData } =
     useGetFormOptionsQuery();
-  const subdivisionOptions = extractNonNullItems(
-    formOptionsData?.formOptions?.subdivisions
-  );
-  const countryOptions = extractNonNullItems(
-    formOptionsData?.formOptions?.countries
-  );
-
-  // Query
   const { data, loading } = useGetCustomerQuery({
     variables: {
       customerUuid,
     },
     skip: !customerUuid,
   });
+
+  const subdivisionOptions = extractNonNullItems(
+    formOptionsData?.formOptions?.subdivisions
+  );
+  const countryOptions = extractNonNullItems(
+    formOptionsData?.formOptions?.countries
+  );
 
   // Mutation
   const [updateCustomer] = useUpdateCustomerMutation({

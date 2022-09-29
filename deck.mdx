@@ -13,23 +13,23 @@ import {
 
 export const theme = shadesOfPurple;
 
-# Testing react Components
+## Testing Components That Make Api Calls
 
 ---
 
 ## Agenda
 
 - Context
-- Solutions in the community
+- How do we test?
 - Proposition
-  - Tools
-  - Benefit of using the tools
-- Proposition in practice
 - Feedback
 
 ---
 
 # Context/Background
+
+1. How to test components that makes API calls?
+2. Should I mock the HTTP client(react-query, react-apollo, fetch)?
 
 ---
 
@@ -39,7 +39,15 @@ export const theme = shadesOfPurple;
 
 ```
 
-```js 41:46 file=./code/problem.tsx title="Example of query"
+```js 2:6 file=./code/problem.tsx title="import Hooks that make network calls" subtitle="under the hood these are using React Apollo"
+
+```
+
+```js 27:29 file=./code/problem.tsx title="Component dependency"
+
+```
+
+```js 31:40 file=./code/problem.tsx title="Queries executed in the app" subtitle="But how do we test skip?"
 
 ```
 
@@ -51,7 +59,7 @@ export const theme = shadesOfPurple;
 
 ```
 
-```js 110:116 file=./code/problem.tsx subtitle="handles the loading state of the query"
+```js 110:116 file=./code/problem.tsx title="handles the loading state of the query" subtitle="how do we test loading states?"
 
 ```
 
@@ -59,7 +67,7 @@ export const theme = shadesOfPurple;
 
 ```
 
-```js 159[17:40] file=./code/problem.tsx subtitle="Loading state when the mutation executes"
+```js 159[17:40] file=./code/problem.tsx title="Loading state when the mutation executes" subtitle="how do we test loading states?"
 
 ```
 
@@ -67,71 +75,138 @@ export const theme = shadesOfPurple;
 
 ---
 
-## Proposition (use a combination of these tools)
-
-- [Mock Service Worker(MSW)](https://mswjs.io/)
-
-  Mocks by intercepting requests on the network level/layer.
-
-- [Codegen TS MSW generator](https://www.the-guild.dev/graphql/codegen/plugins/typescript/typescript-msw)
-
-  This plugin generates mock handlers with Typescript
-
-- [graphql-codegen-factories](https://gabinaureche.com/graphql-codegen-factories/)
-
-  This plugin generates factories from a Graphql schema and operations
+## So, How we do we currently test?
 
 ---
 
-<CodeSurferColumns themes={[vsDark, github]}>
+We use a mix of approaches.
 
-<Step>
-
-```js
-const magna = (aliqua) => aliqua.ut((enim, ad) => enim, 0);
-```
-
-```js
-const minim = (ad, enim) => dolore.magna(ad / enim);
-```
-
-</Step>
-
-<Step>
-
-```js
-const lorem = (ipsum, dolor, sit) => {
-  const amet = dolor - ipsum;
-  return consectetur.adipiscing(
-    {
-      elit: sed.eiusmod(sit - dolor) / amet + 2,
-    },
-    (tempor, incididunt) => ipsum + amet * incididunt
-  );
-};
-
-const magna = (aliqua) => aliqua.ut((enim, ad) => enim, 0);
-```
-
-```js
-const minim = (ad, enim) => dolore.magna(ad / enim);
-
-const sed = (eiusmod, tempor, incididunt) => {
-  const ut = tempor - eiusmod;
-  return labore.et(
-    {
-      amet: dolore.magna(incididunt - tempor) / ut + 2,
-    },
-    (aliqua, elit) => eiusmod + ut * elit
-  );
-};
-```
-
-</Step>
-
-</CodeSurferColumns>
+1. Tests with [MockedProvider](https://www.apollographql.com/docs/react/api/react/testing/) (React-Apollo recommendation)
+2. Tests that mock the client (next slide)
+3. Others...
 
 ---
 
-docs:
-[codesurfer.pomb.us](https://codesurfer.pomb.us)
+<CodeSurfer theme={nightOwl}>
+
+```js 10:31 file=./code/oldsolution.tsx title="Mock imports and hooks" subtitle="mockFuntion is a TS utility to enforce the correct usage of the mock"
+
+```
+
+```js 33:45 file=./code/oldsolution.tsx title="Sample responses"
+
+```
+
+```js 48:68 file=./code/oldsolution.tsx
+
+```
+
+```js 82:109 file=./code/oldsolution.tsx title="Example of a test" subtitle="showNotification is never called, which runs after success"
+
+```
+
+</CodeSurfer>
+
+---
+
+## Proposition
+
+use a combination of the following tools
+
+---
+
+1. [Mock Service Worker(MSW)](https://mswjs.io/)
+
+Mocks by intercepting requests on the network layer.
+
+---
+
+<CodeSurfer theme={nightOwl}>
+
+```js 1:3 file="./code/msw.ts"
+
+```
+
+```js 4:10 file="./code/msw.ts" subtitle="sets up a mutation"
+
+```
+
+```js 12:37 file="./code/msw.ts" subtitle="handling of queries"
+
+```
+
+```js 39:43 file="./code/msw.ts" subtitle="handling of rest endpoints"
+
+```
+
+```js 45:48 file="./code/msw.ts" subtitle="how to start the server"
+
+```
+
+</CodeSurfer>
+
+---
+
+2. [Codegen TS MSW generator](https://www.the-guild.dev/graphql/codegen/plugins/typescript/typescript-msw)
+
+Generates typescript mock handlers based on Graphql schemas and operations.
+
+```
+export const mockLoginMutation = (resolver: Resolver) =>
+  graphql.mutation<LoginMutation, LoginInput>(
+    "Login",
+    resolver
+  );
+```
+
+---
+
+3. [graphql-codegen-factories](https://gabinaureche.com/graphql-codegen-factories/)
+
+Generates factories based on Graphql schemas and operations
+
+```
+export function createLoginInputMock(
+  props: Partial<LoginInput> = {}
+): LoginInput {
+  return {
+    email: faker.lorem.word(),
+    password: null,
+    ...props,
+  };
+}
+```
+
+---
+
+<CodeSurfer theme={nightOwl}>
+
+```js 1:21 file="./code/solution.tsx"
+
+```
+
+```js 22:34 file="./code/solution.tsx" subtitle="the only mock in the test"
+
+```
+
+```js 40:66 file="./code/solution.tsx" subtitle="tests that check for success"
+
+```
+
+```js 43:45 file="./code/solution.tsx" subtitle="tests loading state"
+
+```
+
+```js 58:60 file="./code/solution.tsx" subtitle="tests loading state on submit"
+
+```
+
+```js 69:95 file="./code/solution.tsx" subtitle="tests for the error state"
+
+```
+
+</CodeSurfer>
+
+---
+
+Thanks, Questions? Thoughts?
